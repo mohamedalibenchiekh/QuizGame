@@ -11,7 +11,6 @@ QuizGame is a distributed system that manages a multiplayer quiz game, integrati
 - [Accessing the Application](#accessing-the-application)
 - [API Documentation](#api-documentation)
 - [Docker Deployment](#docker-deployment)
-- [Troubleshooting](#troubleshooting)
 
 ## Features
 
@@ -77,7 +76,7 @@ The application follows a microservices architecture with the following componen
 ### Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/mohamedalibenchiekh/QuizGame.git
 cd QuizGame
 ```
 
@@ -209,33 +208,6 @@ docker-compose ps
 ```bash
 docker-compose down
 ```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Port already in use**:
-   - Make sure ports 50051 (gRPC) and 8080 (REST) are available
-   - Check for running processes: `lsof -i :50051` or `lsof -i :8080`
-
-2. **Docker build issues**:
-   - Ensure the JAR file is built before building the Docker image: `mvn clean package`
-   - Check Docker logs: `docker-compose logs quizgame`
-
-3. **MongoDB connection issues**:
-   - Verify MongoDB container is running: `docker-compose ps`
-   - Check MongoDB logs: `docker-compose logs mongo`
-
-4. **Kafka connection issues**:
-   - Verify Kafka container is running: `docker-compose ps`
-   - Check Kafka logs: `docker-compose logs kafka`
-
-For more detailed troubleshooting, check the application logs:
-
-```bash
-docker-compose logs quizgame
-```
-
 ---
 
 ## Acknowledgments
