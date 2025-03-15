@@ -1,0 +1,7 @@
+com/quizgame/database/QuizDAOTest.class
+com/quizgame/database/TestDatabaseConnection.class
+com/quizgame/kafka/KafkaConsumerServiceTest.class
+com/quizgame/gameplay/GameplayServiceTest.class
+com/quizgame/player/PlayerManagementServiceTest.class
+com/quizgame/database/PlayerDAOTest.class
+com/quizgame/kafka/KafkaProducerServiceTest.class

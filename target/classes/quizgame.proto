@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package quizgame;
+
+option java_package = "com.quizgame.proto";
+option java_multiple_files = true;
+option java_outer_classname = "QuizGameProto";
+
+// Define all message types first
+
+message RegisterPlayerRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message RegisterPlayerResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message PlayerRequest {
+  string player_name = 1;
+}
+
+message PlayerResponse {
+  string message = 1;
+}
+
+message QuizRequest {
+  // No fields needed for now
+}
+
+message QuizResponse {
+  repeated string questions = 1;
+}
+
+message AnswerRequest {
+  string player_name = 1;
+  string answer = 2;
+}
+
+message AnswerResponse {
+  string message = 1;
+}
+
+// Define services after message types
+
+service PlayerManagementService {
+  rpc RegisterPlayer (RegisterPlayerRequest) returns (RegisterPlayerResponse);
+}
+
+service Gameplay {
+  rpc LoadQuiz (QuizRequest) returns (QuizResponse);
+  rpc SubmitAnswer (AnswerRequest) returns (AnswerResponse);
+}

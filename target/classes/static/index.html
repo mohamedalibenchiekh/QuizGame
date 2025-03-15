@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizGame Web Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], 
+        input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            min-height: 100px;
+        }
+        .quiz-question {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QuizGame Web Interface</h1>
+        
+        <!-- Player Registration Section -->
+        <div class="section">
+            <h2>Player Registration</h2>
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter your username">
+            
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password">
+            
+            <button onclick="registerPlayer()">Register</button>
+        </div>
+        
+        <!-- Quiz Loading Section -->
+        <div class="section">
+            <h2>Quiz</h2>
+            <button onclick="loadQuiz()">Load Quiz</button>
+            <div id="questions-container"></div>
+        </div>
+        
+        <!-- Answer Submission Section -->
+        <div class="section">
+            <h2>Submit Answer</h2>
+            <label for="playerName">Player Name</label>
+            <input type="text" id="playerName" placeholder="Enter your player name">
+            
+            <label for="answer">Answer</label>
+            <input type="text" id="answer" placeholder="Enter your answer">
+            
+            <button onclick="submitAnswer()">Submit Answer</button>
+        </div>
+        
+        <!-- Response Display Section -->
+        <div class="section">
+            <h2>Response</h2>
+            <div id="response"></div>
+        </div>
+    </div>
+
+    <script>
+        // Register a new player
+        function registerPlayer() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                displayResponse({ success: false, message: "Username and password are required" });
+                return;
+            }
+            
+            fetch('/api/players/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayResponse(data);
+                // If registration successful, set the player name
+                if (data.success) {
+                    document.getElementById('playerName').value = username;
+                }
+            })
+            .catch(error => {
+                displayResponse({ success: false, message: "Error: " + error.message });
+            });
+        }
+        
+        // Load quiz questions
+        function loadQuiz() {
+            fetch('/api/game/quiz')
+            .then(response => response.json())
+            .then(data => {
+                displayResponse(data);
+                
+                // Display questions if available
+                const questionsContainer = document.getElementById('questions-container');
+                questionsContainer.innerHTML = '';
+                
+                if (data.success && data.data) {
+                    data.data.forEach((question, index) => {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.className = 'quiz-question';
+                        questionDiv.textContent = `Q${index + 1}: ${question}`;
+                        questionsContainer.appendChild(questionDiv);
+                    });
+                }
+            })
+            .catch(error => {
+                displayResponse({ success: false, message: "Error: " + error.message });
+            });
+        }
+        
+        // Submit an answer
+        function submitAnswer() {
+            const playerName = document.getElementById('playerName').value;
+            const answer = document.getElementById('answer').value;
+            
+            if (!playerName || !answer) {
+                displayResponse({ success: false, message: "Player name and answer are required" });
+                return;
+            }
+            
+            fetch('/api/game/submit-answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ playerName, answer })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayResponse(data);
+            })
+            .catch(error => {
+                displayResponse({ success: false, message: "Error: " + error.message });
+            });
+        }
+        
+        // Display response in UI
+        function displayResponse(data) {
+            const responseElement = document.getElementById('response');
+            responseElement.innerHTML = `
+                <p><strong>Success:</strong> ${data.success}</p>
+                <p><strong>Message:</strong> ${data.message}</p>
+                ${data.data ? `<p><strong>Data:</strong> ${JSON.stringify(data.data)}</p>` : ''}
+            `;
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,55 @@
+version: '3'
+services:
+  mongo:
+    image: mongo:4.2.2
+    container_name: quizgame-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-data:/data/db
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: quizgame-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: quizgame-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    volumes:
+      - zookeeper-data:/bitnami/zookeeper
+
+  quizgame:
+    build: .
+    container_name: quizgame-app
+    ports:
+      - "50051:50051"  # gRPC port
+      - "8080:8080"    # REST API port
+    depends_on:
+      - mongo
+      - kafka
+    environment:
+      - SPRING_DATA_MONGODB_HOST=mongo
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_USERNAME=root
+      - SPRING_DATA_MONGODB_PASSWORD=example
+      - SPRING_DATA_MONGODB_DATABASE=QuizGame
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    restart: on-failure
+
+volumes:
+  mongo-data:
+  zookeeper-data:
