@@ -83,7 +83,7 @@ cd QuizGame
 ### Build the Application
 
 ```bash
-mvn clean package
+mvn clean package -DskipTests
 ```
 
 ### Run Locally
