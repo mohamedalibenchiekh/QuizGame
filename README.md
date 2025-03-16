@@ -247,8 +247,7 @@ docker-compose down
 
 #### OpenAPI Documentation
 
-- Swagger UI is available at http://localhost:8080/swagger-ui/index.html
-- If documentation is not showing correctly, check SpringDoc configuration in application.properties
+- Swagger UI is available at http://localhost:8080/swagger-ui/
 
 ---
 
