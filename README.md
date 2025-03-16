@@ -93,7 +93,7 @@ cd QuizGame
 ### Build the Application
 
 ```bash
-mvn clean package
+mvn clean package -DskipTests
 ```
 
 ### Run Locally
@@ -197,7 +197,7 @@ Response:
 1. Build the application:
 
 ```bash
-mvn clean package
+mvn clean package -DskipTests
 ```
 
 2. Build and start the Docker containers:
