@@ -1,7 +1,7 @@
-/home/dell/Desktop/MS dev/S1/Distributed Systems/Lbas/QuizGame/src/test/java/com/quizgame/database/PlayerDAOTest.java
-/home/dell/Desktop/MS dev/S1/Distributed Systems/Lbas/QuizGame/src/test/java/com/quizgame/database/QuizDAOTest.java
-/home/dell/Desktop/MS dev/S1/Distributed Systems/Lbas/QuizGame/src/test/java/com/quizgame/gameplay/GameplayServiceTest.java
-/home/dell/Desktop/MS dev/S1/Distributed Systems/Lbas/QuizGame/src/test/java/com/quizgame/kafka/KafkaProducerServiceTest.java
-/home/dell/Desktop/MS dev/S1/Distributed Systems/Lbas/QuizGame/src/test/java/com/quizgame/player/PlayerManagementServiceTest.java
-/home/dell/Desktop/MS dev/S1/Distributed Systems/Lbas/QuizGame/src/test/java/com/quizgame/kafka/KafkaConsumerServiceTest.java
-/home/dell/Desktop/MS dev/S1/Distributed Systems/Lbas/QuizGame/src/test/java/com/quizgame/database/TestDatabaseConnection.java
+C:\Users\moham\QuizGame\src\test\java\com\quizgame\database\PlayerDAOTest.java
+C:\Users\moham\QuizGame\src\test\java\com\quizgame\kafka\KafkaProducerServiceTest.java
+C:\Users\moham\QuizGame\src\test\java\com\quizgame\gameplay\GameplayServiceTest.java
+C:\Users\moham\QuizGame\src\test\java\com\quizgame\database\TestDatabaseConnection.java
+C:\Users\moham\QuizGame\src\test\java\com\quizgame\kafka\KafkaConsumerServiceTest.java
+C:\Users\moham\QuizGame\src\test\java\com\quizgame\database\QuizDAOTest.java
+C:\Users\moham\QuizGame\src\test\java\com\quizgame\player\PlayerManagementServiceTest.java

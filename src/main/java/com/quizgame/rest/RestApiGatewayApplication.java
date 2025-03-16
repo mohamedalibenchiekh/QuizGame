@@ -3,12 +3,14 @@ package com.quizgame.rest;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import com.quizgame.proto.PlayerManagementServiceGrpc;
 import com.quizgame.proto.GameplayGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 @SpringBootApplication
+@ComponentScan(basePackages = {"com.quizgame.rest", "com.quizgame.service", "com.quizgame.database"})
 public class RestApiGatewayApplication {
 
     private static final String GRPC_SERVER_HOST = "localhost";

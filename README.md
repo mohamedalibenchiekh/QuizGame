@@ -3,6 +3,7 @@
 QuizGame is a distributed system that manages a multiplayer quiz game, integrating gRPC for real-time communication, Kafka for event-driven processing, and MongoDB for persistent data storage. The system also provides a REST API Gateway for web browser access.
 
 ## Table of Contents
+
 - [Features](#features)
 - [System Architecture](#system-architecture)
 - [Technology Stack](#technology-stack)
@@ -11,22 +12,27 @@ QuizGame is a distributed system that manages a multiplayer quiz game, integrati
 - [Accessing the Application](#accessing-the-application)
 - [API Documentation](#api-documentation)
 - [Docker Deployment](#docker-deployment)
+- [Troubleshooting](#troubleshooting)
 
 ## Features
 
 - **Player Management**
+
   - Register players and store their details in MongoDB
   - Automatically remove inactive players (using MongoDB TTL)
 
 - **Game Play**
+
   - Load quiz questions from the database
   - Play the game with real-time interactions
 
 - **Response Evaluation**
+
   - Validate player answers
   - Update player scores in the MongoDB database
 
 - **Game Analysis**
+
   - View statistics about users (connected users, scores, etc.)
 
 - **Multiple Interface Support**
@@ -38,20 +44,24 @@ QuizGame is a distributed system that manages a multiplayer quiz game, integrati
 The application follows a microservices architecture with the following components:
 
 ### gRPC Services
+
 - **Player Management Service**: Handles player registration and management
 - **Gameplay Service**: Manages quiz sessions and game logic
 
 ### Kafka Integration
+
 - **Player Management Producer**: Sends player registration events to Kafka
 - **Gameplay Producer**: Sends player answer events to Kafka
 - **ScoreUpdate Consumer**: Validates answers and updates user scores
 - **Statistics Consumer**: Tracks game statistics
 
 ### MongoDB Database
+
 - **Quizzes Collection**: Stores quiz questions and answers
 - **Players Collection**: Stores player information and scores
 
 ### REST API Gateway
+
 - Translates HTTP/JSON requests to gRPC calls
 - Enables web browser access to the application
 
@@ -103,9 +113,11 @@ mvn exec:java -Dexec.mainClass="com.quizgame.client.TestClient"
 ## Accessing the Application
 
 ### gRPC Interface
+
 The gRPC server runs on port 50051. You can use any gRPC client to connect to it.
 
 ### REST API Gateway
+
 The REST API Gateway runs on port 8080. You can access it using any web browser or HTTP client.
 
 - Web Interface: http://localhost:8080/
@@ -119,6 +131,7 @@ The REST API Gateway runs on port 8080. You can access it using any web browser 
 ### Player Management API
 
 #### Register Player
+
 ```
 POST /api/players/register
 Content-Type: application/json
@@ -130,6 +143,7 @@ Content-Type: application/json
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -140,23 +154,23 @@ Response:
 ### Game API
 
 #### Load Quiz
+
 ```
 GET /api/game/quiz
 ```
 
 Response:
+
 ```json
 {
   "success": true,
   "message": "Quiz loaded successfully",
-  "data": [
-    "What is the capital of France?",
-    "Who wrote Romeo and Juliet?"
-  ]
+  "data": ["What is the capital of France?", "Who wrote Romeo and Juliet?"]
 }
 ```
 
 #### Submit Answer
+
 ```
 POST /api/game/submit-answer
 Content-Type: application/json
@@ -168,6 +182,7 @@ Content-Type: application/json
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -192,6 +207,7 @@ docker-compose up -d
 ```
 
 This will start:
+
 - MongoDB on port 27017
 - Zookeeper on port 2181
 - Kafka on port 9092
@@ -208,9 +224,40 @@ docker-compose ps
 ```bash
 docker-compose down
 ```
+
+## Troubleshooting
+
+### Common Issues
+
+#### MongoDB Connection Issues
+
+- Ensure MongoDB is running and accessible at the configured host/port
+- Check that the username and password in your environment variables match those in `docker-compose.yml`
+- If running locally outside Docker, ensure MongoDB is installed and running
+
+#### Spring Boot REST API Connection
+
+- If REST API fails to start, check port conflicts on 8080
+- Verify Spring Boot dependencies are correctly configured in pom.xml
+
+#### Static Method Errors
+
+- The application uses Spring's dependency injection. Avoid calling methods statically
+- Instead of `MongoDBConnection.close()`, create an instance first: `new MongoDBConnection().close()`
+
+#### OpenAPI Documentation
+
+- Swagger UI is available at http://localhost:8080/swagger-ui/index.html
+- If documentation is not showing correctly, check SpringDoc configuration in application.properties
+
 ---
 
 ## Acknowledgments
 
 - Built as part of a distributed systems course project
 - Uses several open source libraries and frameworks
+
+## Version
+
+- Current version: 1.1.0
+- Last updated: March 2025
