@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.bson.types.ObjectId;
 
 import java.util.*;
+import javax.servlet.http.HttpSession;
 
 @Controller
 public class WebController {
@@ -37,7 +38,48 @@ public class WebController {
         return "home";
     }
 
-    // 1. Register a new player
+    // 1. Login for existing players
+    @GetMapping("/login")
+    public String loginForm(Model model) {
+        model.addAttribute("player", new PlayerDto());
+        return "login";
+    }
+
+    @PostMapping("/login")
+    public String loginPlayer(@ModelAttribute PlayerDto player, 
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        // For admin login (hardcoded)
+        if ("admin".equals(player.getUsername()) && "test".equals(player.getPassword())) {
+            // Store admin username in session
+            session.setAttribute("username", player.getUsername());
+            session.setAttribute("isAdmin", true);
+            return "redirect:/admin";
+        }
+
+        // For regular player login (in a real app, use authentication service)
+        try {
+            // TODO: Implement proper authentication with the gRPC service
+            // For now, we'll assume authentication succeeds if username and password are not empty
+            if (player.getUsername() != null && !player.getUsername().isEmpty() && 
+                player.getPassword() != null && !player.getPassword().isEmpty()) {
+                // Store username in session
+                session.setAttribute("username", player.getUsername());
+                session.setAttribute("isAdmin", false);
+                redirectAttributes.addFlashAttribute("message", "Login successful!");
+                redirectAttributes.addFlashAttribute("playerName", player.getUsername());
+                return "redirect:/quizzes";
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Invalid username or password");
+                return "redirect:/login";
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Login failed: " + e.getMessage());
+            return "redirect:/login";
+        }
+    }
+
+    // 2. Register a new player
     @GetMapping("/register")
     public String registerForm(Model model) {
         model.addAttribute("player", new PlayerDto());
@@ -63,7 +105,90 @@ public class WebController {
         }
     }
 
-    // 2. Load quiz questions
+    // 3. Admin dashboard and functionality
+    @GetMapping("/admin")
+    public String adminDashboard(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        // Check if user is admin
+        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
+        if (isAdmin == null || !isAdmin) {
+            redirectAttributes.addFlashAttribute("error", "You must be an admin to access this page");
+            return "redirect:/login";
+        }
+        
+        String username = (String) session.getAttribute("username");
+        model.addAttribute("username", username);
+        return "admin";
+    }
+    
+    @GetMapping("/admin/questions")
+    public String adminQuestions(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        // Check if user is admin
+        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
+        if (isAdmin == null || !isAdmin) {
+            redirectAttributes.addFlashAttribute("error", "You must be an admin to access this page");
+            return "redirect:/login";
+        }
+        
+        String username = (String) session.getAttribute("username");
+        model.addAttribute("username", username);
+        
+        // Get all quizzes for the dropdown
+        List<Quiz> quizzes = quizService.getAllQuizzes();
+        model.addAttribute("quizzes", quizzes);
+        
+        return "admin-questions";
+    }
+    
+    @PostMapping("/admin/questions/add")
+    public String addQuestion(HttpSession session,
+                             @RequestParam(required = false) String quizId,
+                             @RequestParam(required = false) String quizTitle,
+                             @RequestParam(required = false) String quizDescription,
+                             @RequestParam String questionText,
+                             @RequestParam Map<String, String> options,
+                             @RequestParam int correctAnswerIndex,
+                             RedirectAttributes redirectAttributes) {
+        
+        // Check if user is admin
+        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
+        if (isAdmin == null || !isAdmin) {
+            redirectAttributes.addFlashAttribute("error", "You must be an admin to access this page");
+            return "redirect:/login";
+        }
+        
+        try {
+            Quiz targetQuiz;
+            
+            // Check if we're creating a new quiz or using an existing one
+            if ("new".equals(quizId)) {
+                // Create new quiz
+                targetQuiz = quizService.createQuiz(quizTitle, quizDescription);
+            } else {
+                // Get existing quiz
+                targetQuiz = quizService.getQuizById(quizId);
+            }
+            
+            // Extract options from form parameters
+            List<String> optionsList = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                optionsList.add(options.get("options[" + i + "]"));
+            }
+            
+            // Create new question
+            Question question = new Question(questionText, optionsList, correctAnswerIndex);
+            
+            // Add to quiz and save
+            quizService.addQuestionToQuiz(new ObjectId(targetQuiz.getId().toString()), question);
+            
+            redirectAttributes.addFlashAttribute("message", "Question added successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to add question: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/questions";
+    }
+
+    // 4. Load quiz questions
     @GetMapping("/quizzes")
     public String listQuizzes(Model model) {
         List<Quiz> quizzes = quizService.getAllQuizzes();
@@ -132,7 +257,7 @@ public class WebController {
         return quiz;
     }
 
-    // 3. Submit answers
+    // 5. Submit answers
     @PostMapping("/quiz/{id}/submit")
     public String submitAnswer(@PathVariable String id, 
                              @RequestParam String playerName,
@@ -165,12 +290,20 @@ public class WebController {
         return "redirect:/results?player=" + playerName;
     }
 
-    // 4. View results
+    // 6. View results
     @GetMapping("/results")
     public String viewResults(@RequestParam String player, Model model) {
         List<String> responses = playerResponses.getOrDefault(player, new ArrayList<>());
         model.addAttribute("responses", responses);
         model.addAttribute("playerName", player);
         return "results";
+    }
+    
+    // 7. Logout
+    @GetMapping("/logout")
+    public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
+        session.invalidate();
+        redirectAttributes.addFlashAttribute("message", "You have been logged out");
+        return "redirect:/";
     }
 } 
